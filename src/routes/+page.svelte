@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { useFullscreen } from "$lib/actions/fullscreen"
+	import { useFullscreen } from "@terrygonguet/svelte-fullscreen"
 	import Focus from "$lib/components/Focus.svelte"
 
 	const { fullscreen, enter } = useFullscreen()
