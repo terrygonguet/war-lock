@@ -10,8 +10,8 @@
 	<meta name="description" value="WIP" />
 </svelte:head>
 
-<main on:fullscreenchange={console.log} use:fullscreen on:click={enter}>
-	<Focus />
+<main use:fullscreen on:click={enter}>
+	<Focus density={2} />
 </main>
 
 <style>
