@@ -1,0 +1,3 @@
+war-lock.localhost {
+	reverse_proxy localhost:5173
+}

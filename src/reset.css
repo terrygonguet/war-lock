@@ -1,0 +1,39 @@
+*,
+*::before,
+*::after {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	color: inherit;
+	background: none;
+	box-sizing: border-box;
+	scrollbar-width: thin;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+	max-width: 100%;
+}
+
+button {
+	cursor: pointer;
+}
+
+/* enable focus outline for accessibility */
+:focus-visible {
+	outline-color: var(--focus-outline-color, deepskyblue);
+	outline-width: var(--focus-outline-width, 1px);
+	outline-style: auto;
+	outline-offset: var(--focus-outline-offset, 0);
+}
+
+/* make root element size of viewport */
+html,
+body {
+	block-size: 100%;
+}

@@ -1,25 +1,29 @@
-<slot />
+<script lang="ts">
+	import "../reset.css"
 
-<style global>
-	* {
-		scrollbar-width: thin;
-	}
+	let { children } = $props()
+</script>
 
-	body {
-		margin: 0;
-		padding: 0;
-		min-height: 100vh;
+{@render children()}
+
+<style>
+	:global(body) {
 		display: grid;
-	}
-
-	body > #app {
-		display: grid;
-		grid-template-areas: "main";
 		grid-template-columns: 1fr;
-		grid-template-rows: 1fr;
+		grid-template-rows: auto 1fr auto;
+		grid-template-areas:
+			"header"
+			"main"
+			"footer";
 	}
 
-	body > #app > main {
+	:global(body > div > header) {
+		grid-area: header;
+	}
+	:global(body > div > main) {
 		grid-area: main;
+	}
+	:global(body > div > footer) {
+		grid-area: footer;
 	}
 </style>
