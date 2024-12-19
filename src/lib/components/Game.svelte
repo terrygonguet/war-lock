@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { runGame } from "$lib/game"
+	import { startGame } from "$lib/game/index"
 
 	interface Props {
 		id: string
@@ -7,13 +7,10 @@
 
 	let { id }: Props = $props()
 	let container = $state<HTMLElement>()!
+
 	$effect(() => {
-		let cleanup = runGame(container)
-		console.log("started")
-		return () => {
-			cleanup()
-			console.log("destroyed")
-		}
+		let destroy = startGame(container)
+		return () => destroy()
 	})
 </script>
 
