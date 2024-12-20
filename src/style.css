@@ -1,0 +1,20 @@
+body {
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-template-rows: auto 1fr auto;
+	grid-template-areas:
+		"header"
+		"main"
+		"footer";
+
+	& > div > header {
+		grid-area: header;
+	}
+	& > div > main {
+		grid-area: main;
+		min-height: 0;
+	}
+	& > div > footer {
+		grid-area: footer;
+	}
+}

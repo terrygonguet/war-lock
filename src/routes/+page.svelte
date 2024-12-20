@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { dev } from "$app/environment"
 	import { useFullscreen } from "$lib/actions/fullscreen"
 	import Game from "$lib/components/Game.svelte"
 
@@ -7,13 +8,12 @@
 
 <main use:fullscreen>
 	<Game id="game" />
-	<section id="need-fullscreen">
-		<p>Need fullscreen</p>
-		<button onclick={enter}>Go fullscreen</button>
-	</section>
-	<section id="need-phone">
-		<p>For now this game only functions on touch devices in portrait mode, ie phones.</p>
-	</section>
+	{#if !dev}
+		<section id="need-fullscreen">
+			<p>Need fullscreen</p>
+			<button onclick={enter}>Go fullscreen</button>
+		</section>
+	{/if}
 </main>
 
 <style>
@@ -52,15 +52,8 @@
 	}
 
 	#need-fullscreen,
-	#need-phone,
 	main > :global(#game) {
 		grid-area: 1 / 1 / -1 / -1;
-	}
-
-	@media (orientation: portrait) and (any-pointer: coarse) {
-		#need-phone {
-			display: none;
-		}
 	}
 
 	@media (display-mode: fullscreen) {
