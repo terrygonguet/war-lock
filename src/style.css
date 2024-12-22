@@ -1,3 +1,8 @@
+@font-face {
+	font-family: "Press Start 2P";
+	src: url("/fonts/press-start-2p.ttf");
+}
+
 body {
 	display: grid;
 	grid-template-columns: 1fr;

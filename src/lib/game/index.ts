@@ -1,59 +1,76 @@
 import { dev } from "$app/environment"
 import { createGrid } from "$lib/game/dev"
-import { Application, Assets, Point, Sprite, Spritesheet } from "pixi.js"
-import { bundles, manifest } from "$assets/manifest"
+import {
+	Application,
+	Assets,
+	BitmapText,
+	Container,
+	Sprite,
+	Spritesheet,
+	type ApplicationOptions,
+} from "pixi.js"
 import { createCamera } from "$lib/game/camera"
+import { make_randi, seeded } from "@terrygonguet/utils/random"
 
-export function startGame(container: HTMLElement) {
-	const app = new Application()
-
-	console.log("Starting game...")
-	init(app, container).then(() => console.log("Game started"))
-
-	return () => {
-		console.log("Destroying game...")
-		app.destroy({ removeView: true }, { children: true })
-		Assets.reset()
-		console.log("Game destroyed")
-	}
-}
-
-async function init(app: Application, container: HTMLElement) {
+export async function init(
+	app: Application,
+	container: HTMLElement,
+	options?: Partial<ApplicationOptions>,
+) {
 	await app.init({
 		autoDensity: true,
 		resizeTo: container,
 		resolution: (devicePixelRatio ?? 1) * 2,
 		clearBeforeRender: true,
 		background: 0xf5f5f5,
-		hello: dev,
+		...options,
 	})
 	container.appendChild(app.canvas)
 
-	const { screen, stage } = app
+	const { screen, stage, ticker } = app
 	stage.position.set(screen.width / 2, screen.height / 2)
 
-	Assets.init({ manifest })
-	await Assets.loadBundle([bundles.terrain])
+	Assets.init({
+		manifest: {
+			bundles: [
+				{
+					name: "terrain",
+					assets: [
+						{
+							alias: "terrain.sheet",
+							src: "/sprites/terrain.sheet.json",
+						},
+					],
+				},
+			],
+		},
+	})
+	await Assets.loadBundle(["terrain"])
 
-	const dummy = new Point()
+	const dummy = new Container()
+	stage.addChild(dummy)
+
 	const camera = createCamera({ stage, screen, follow: dummy })
 	stage.addChild(camera.container)
-
-	app.ticker.add(() => {
-		camera.update()
-	})
+	ticker.add(camera.update)
 
 	if (dev) {
 		const grid = createGrid()
 		stage.addChild(grid)
+		ticker.start()
 	}
 
 	const sheet = Assets.get<Spritesheet>("terrain.sheet")
 	sheet.textureSource.scaleMode = "nearest"
 
-	for (let x = -5; x < 5; x++) {
-		for (let y = -5; y < 5; y++) {
-			const grassBlock = new Sprite(sheet.textures["grass_carpet"])
+	const terrain = new Container()
+	stage.addChild(terrain)
+
+	const randi = make_randi(dev ? seeded(51618698) : Math.random)
+	const textures = ["grass_carpet", "grass_slab", "grass_block"]
+	for (let x = -25; x < 25; x++) {
+		for (let y = -25; y < 25; y++) {
+			const grassBlock = new Sprite(sheet.textures[textures[randi(3)]])
 			grassBlock.position.set((x + y) * 16, (x - y) * 8)
 			grassBlock.anchor.set(0, 0.75)
 			grassBlock.zIndex = x - y

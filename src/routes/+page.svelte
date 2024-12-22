@@ -6,6 +6,10 @@
 	const { action: fullscreen, enter } = useFullscreen()
 </script>
 
+<svelte:head>
+	<title>WIP - WarLock</title>
+</svelte:head>
+
 <main use:fullscreen>
 	<Game id="game" />
 	{#if !dev}
