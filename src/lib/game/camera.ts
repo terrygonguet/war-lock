@@ -21,7 +21,7 @@ export function createCamera({
 	stage,
 	screen,
 	follow,
-	min = 0.5,
+	min = 0.6,
 	max = 4,
 	delta = 0.2,
 }: CreateCameraOptions): Camera {
