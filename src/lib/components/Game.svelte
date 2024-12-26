@@ -10,7 +10,7 @@
 
 	let { id }: Props = $props()
 	let container = $state<HTMLElement>()
-	let fps = $state(0)
+	let fps = smoothed(0)
 	let renderTime = smoothed(0)
 
 	$effect(() => {
@@ -25,7 +25,7 @@
 		if (dev) {
 			started.then(() =>
 				app.ticker.add(({ FPS }) => {
-					fps = FPS
+					fps.$ = FPS
 					const before = performance.now()
 					app.render()
 					renderTime.$ = performance.now() - before
@@ -46,7 +46,7 @@
 <section {id} bind:this={container}>
 	{#if dev}
 		<div id="metrics">
-			<span>{fps.toFixed(1)} FPS</span>
+			<span>{fps.$.toFixed(1)} FPS</span>
 			<span>{renderTime.$.toFixed(2) + "  MS"}</span>
 		</div>
 	{/if}
@@ -72,6 +72,7 @@
 		flex-direction: column;
 		align-items: end;
 		padding: 0.5rem;
+		width: 10ch;
 		white-space: pre;
 	}
 </style>
