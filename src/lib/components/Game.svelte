@@ -2,7 +2,8 @@
 	import { dev } from "$app/environment"
 	import { init } from "$lib/game"
 	import { smoothed } from "$lib/utils/reactive.svelte"
-	import { Application, Assets } from "pixi.js"
+	import { noop } from "@terrygonguet/utils"
+	import { Application } from "pixi.js"
 
 	interface Props {
 		id: string
@@ -11,35 +12,31 @@
 	let { id }: Props = $props()
 	let container = $state<HTMLElement>()
 	let fps = smoothed(0)
+	let tps = smoothed(0)
 	let renderTime = smoothed(0)
 
 	$effect(() => {
 		if (!container) return
 
-		console.log("Starting game...")
 		const app = new Application()
 
-		const started = init(app, container, { autoStart: !dev, hello: dev })
-		started.then(() => console.log("Game started"))
-
-		if (dev) {
-			started.then(() =>
-				app.ticker.add(({ FPS }) => {
+		let destroyGame: () => void = noop
+		init(app, container, { hello: dev }).then(({ graphicsTicker, physicsTicker, destroy }) => {
+			destroyGame = destroy
+			if (dev) {
+				graphicsTicker.add(({ FPS }) => {
 					fps.$ = FPS
 					const before = performance.now()
 					app.render()
 					renderTime.$ = performance.now() - before
-				}),
-			)
-		}
+				})
+				physicsTicker.add(({ FPS }) => {
+					tps.$ = FPS
+				})
+			} else graphicsTicker.add(app.render)
+		})
 
-		return () => {
-			if (!app.stage) return
-			console.log("Destroying game...")
-			app.destroy(true, true)
-			Assets.reset()
-			console.log("Game destroyed")
-		}
+		return () => destroyGame()
 	})
 </script>
 
@@ -47,6 +44,7 @@
 	{#if dev}
 		<div id="metrics">
 			<span>{fps.$.toFixed(1)} FPS</span>
+			<span>{tps.$.toFixed(1)} TPS</span>
 			<span>{renderTime.$.toFixed(2) + "  MS"}</span>
 		</div>
 	{/if}

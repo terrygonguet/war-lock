@@ -18,7 +18,14 @@ export class LoadError extends Error {
 }
 
 export class MapLoader implements LoaderParser<MapData> {
-	name = "loadTmxMap"
+	static name = "loadTmxMap"
+
+	static register(loader: Loader) {
+		if (!loader.parsers.find((parser) => parser.name == MapLoader.name))
+			loader.parsers.push(new MapLoader())
+	}
+
+	name = MapLoader.name
 	extension = {
 		type: ExtensionType.LoadParser,
 		priority: LoaderParserPriority.High,

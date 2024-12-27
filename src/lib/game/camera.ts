@@ -1,10 +1,13 @@
+import type { Controls } from "$lib/game/controls"
 import { clamp } from "@terrygonguet/utils"
-import { Container, Rectangle } from "pixi.js"
+import "pixi.js/math-extras"
+import { Container, Rectangle, Ticker } from "pixi.js"
 
 export interface CreateCameraOptions {
 	stage: Container
 	screen: Rectangle
 	follow: Container
+	controls: Controls
 	min?: number
 	max?: number
 	delta?: number
@@ -13,14 +16,14 @@ export interface CreateCameraOptions {
 export interface Camera {
 	zoomIn(): void
 	zoomOut(): void
-	container: Container
-	update(): void
+	graphicsUpdate(ticker: Ticker): void
 }
 
 export function createCamera({
 	stage,
 	screen,
 	follow,
+	controls,
 	min = 0.6,
 	max = 4,
 	delta = 0.2,
@@ -28,33 +31,28 @@ export function createCamera({
 	const container = new Container()
 	container.renderable = false
 
-	window.addEventListener("wheel", onWheel)
-	container.on("destroyed", () => {
-		window.removeEventListener("wheel", onWheel)
-	})
-
-	function onWheel(evt: WheelEvent) {
-		evt.deltaY > 0 ? zoomOut() : zoomIn()
-	}
+	controls.on("zoom", (deltaY) => (deltaY > 0 ? zoomOut() : zoomIn()))
 
 	let scale = 1
 	function zoomIn() {
 		scale = clamp(scale * (1 + delta), min, max)
-		stage.scale.set(scale)
 	}
 	function zoomOut() {
 		scale = clamp(scale * (1 - delta), min, max)
-		stage.scale.set(scale)
 	}
 
 	return {
 		zoomIn,
 		zoomOut,
-		container,
-		update() {
+		graphicsUpdate() {
 			container.scale = scale
 			container.position.copyFrom(follow.position)
-			stage.position.set(screen.width / 2 - follow.x, screen.height / 2 - follow.y)
+			stage.updateTransform({
+				scaleX: scale,
+				scaleY: scale,
+				x: screen.width / 2 - follow.x * scale,
+				y: screen.height / 2 - follow.y * scale,
+			})
 		},
 	}
 }
